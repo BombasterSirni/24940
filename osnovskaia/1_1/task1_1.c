@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <getopt.h>
 #include <limits.h>
+#include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/resource.h>
 #include <string.h>
