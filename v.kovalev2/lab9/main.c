@@ -4,29 +4,43 @@
 #include <sys/wait.h>
 #include <sys/types.h>
 
-int main(int argc, char *argv[]) {
-    if (argc < 2){
+int main(int argc, char *argv[])
+{
+    setvbuf(stdout, NULL, _IOLBF, 0);
+
+    if (argc < 2) {
         fprintf(stderr, "not enough arguments\n");
-        exit(-1);
+        exit(EXIT_FAILURE);
     }
-    int status;
-    pid_t pid = fork();  
+
+    int wait_status;
+    pid_t pid = fork();
+
     switch (pid)
     {
     case -1:
         perror("fork failed");
-        exit(-1);
+        exit(EXIT_FAILURE);
+
     case 0:
-        execlp("cat", "cat", argv[1], NULL);
+        printf("PID=%ld (child)\n", (long)getpid());
+        fflush(stdout);
+        execlp("cat", "cat", argv[1], (char *)NULL);
         perror("execlp failed");
-        exit(-1);
+        _exit(EXIT_FAILURE);
+
     default:
+        printf("PID=%ld (parent)\n", (long)getpid());
+        fflush(stdout);
+
         printf("success\n");
-        if (waitpid(pid, &status, 0) == -1) {
-            perror("waitpid faileargvd");
-            exit(-1);
+
+        if (waitpid(pid, &wait_status, 0) == -1) {
+            perror("waitpid failed");
+            exit(EXIT_FAILURE);
         }
+
         printf("\nfork exited\n");
-        exit(0);
+        exit(EXIT_SUCCESS);
     }
 }
